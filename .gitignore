@@ -1,0 +1,19 @@
+# Compiled Lisp binaries
+*.ofasl
+*.fasl
+*.ufasl
+*.lx64fsl
+*.lx32fsl
+*.dx64fsl
+*.dfsl
+*.pfsl
+
+# Editor and IDE artifacts
+*~
+\#*\#
+.slime/
+.sly/
+
+# Others
+*.zip
+*.bat
