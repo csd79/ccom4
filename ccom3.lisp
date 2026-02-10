@@ -14,6 +14,7 @@ Print(Worksheet.Range("A1"))
 Worksheet.Name = "New Name"
 
 
+
 Lisp:
 (com:with-temp-interface (workbook)
     (com:with-temp-interface (workbooks)
@@ -28,6 +29,7 @@ Lisp:
     (setf (com:invoke-dispatch-get-property worksheet "Name") "New name")))
 
 
+
 Lisp & CCOM:
 (cclet* ((workbooks (?workbooks global))
          (workbook  (!add workbooks +xl-worksheet+))
@@ -36,7 +38,55 @@ Lisp & CCOM:
   (print (?value2 (?range worksheet address)))
   (setf (?name worksheet) "New name"))
 
+
+
+
+
+Accessors can be passed as argument, e.g.:
+
+  (defun action (getter setter ws)
+    (funcall setter "Juhhéééé!" (range ws 4 4))   ; new value first!
+    (funcall getter (range ws 1 1)))
+
+  (defun main ()
+    (with-property-accessors
+      (setf (property-accessors-on) t)
+      (with-workbook (:open *f* :wsvars (ws1) :read-only nil :save t)
+        (action #'?value2 #'(setf ?value2) ws1))))
+
+(As accessors are pairs of functions, we cannot pass one as a single #'.)
 |#
+
+
+
+
+
+#|
+(!'methodname obj1 (?property-name obj2) arg3)
+
+(com:invoke-dispatch-method obj1 (symbol-name 'methodname)
+                            (com:invoke-dispatch-get-property obj2 (symbol-name property-name)) arg3)
+
+
+
+(setf (?'methodname (range ws 4 4)) "Érték.")
+
+(setf (com:invoke-dispatch-get-property (range ws 4 4) (symbol-name 'methodname)) "Érték.")
+
+
+
+(defun action (accessor ws)
+  (setf (?accessor (range ws 4 4)) "Hurrá!")
+  (?accessor (range ws 4 4)))
+
+(defun main ()
+  (with-workbook (:open *f* :wsvars (ws1) :read-only nil :save t)
+    (action 'value2 ws1)))
+|#
+
+
+
+
 
 
 ;;; ----------------------------------------------------------------------
@@ -158,14 +208,14 @@ Lisp & CCOM:
                           (getsym   (intern-accessor propname package-name))
                           (setsym   (intern-accessor propset package-name))
                           (getfn    #'(lambda (obj &rest args)
-                                        (apply
-                                         #'com:invoke-dispatch-get-property
-                                         obj propname args)))
+                                                    (apply
+                                                     #'com:invoke-dispatch-get-property
+                                                     obj propname args)))
                           (setfn    #'(lambda (value obj &rest args)
-                                        (apply
-                                         #'com:invoke-dispatch-put-property
-                                         obj propname
-                                         (nconc args (list value))))))
+                                                    (apply
+                                                     #'com:invoke-dispatch-put-property
+                                                     obj propname
+                                                     (nconc args (list value))))))
                      (setf (fdefinition getsym) getfn
                            (fdefinition setsym) setfn
                            (fdefinition `(setf ,getsym))
@@ -221,63 +271,6 @@ Lisp & CCOM:
               (cclet-addref (rest vars) (rest vals) body)
               body))))))
 
-
-#|(defmacro cclet* (bindings &body body)
-  "Local binding context for both interface pointers and plain Lisp values."
-  (if bindings
-    (let ((vars (mapcar #'first bindings)))
-      `(with-com-initialized
-         (let* ,bindings
-           (flet ((do-iptrs (fn &optional (order-fn #'identity))
-                    (dolist (var (funcall order-fn ',vars))
-                      (when (live-iptr-p var)
-                        (funcall fn var)))))
-             (unwind-protect
-                 (progn
-                   ,@body)
-               (do-iptrs #'com:release #'reverse))))))
-    `(progn
-       ,@body)))|#
-#|(defmacro cclet* (bindings &body body)
-  "Local binding context for both interface pointers and plain Lisp values."
-  (if bindings
-    (let ((vars (mapcar #'first bindings)))
-      `(with-com-initialized
-         (let* ,bindings
-           (flet ((do-iptrs (&key (refcount 10) (order-fn #'identity))
-                    (dolist (var (funcall order-fn ',vars))
-                      (when (live-iptr-p var)
-                        (ensure-refcount var refcount)))))
-             (unwind-protect
-                 (progn
-                   (do-iptrs)
-                   ,@body)
-               (do-iptrs :refcount 0 :order-fn #'reverse))))))
-    `(progn
-       ,@body)))|#
-#|(defmacro cclet* (bindings &body body)
-  "Local binding context for both interface pointers and plain Lisp values."
-  (if bindings
-    (let* ((vars    (mapcar #'first bindings))
-           (vals    (mapcar #'second bindings))
-           (empties (mapcar #'(lambda (var)
-                                (list var nil))
-                            vars)))
-      `(with-com-initialized 
-         (let* ,empties
-           (unwind-protect
-               (progn
-                 (mapc #'(lambda (var val)
-                           (setf (symbol-value var) val)
-                           (when (live-iptr-p (symbol-value var))
-                             (ensure-refcount (symbol-value var))))
-                       ',vars (list ,@vals))
-                 ,@body)
-             (mapc #'(lambda (var)
-                       (when (live-iptr-p (symbol-value var))
-                         (ensure-refcount (symbol-value var) 0)))
-                   ',(reverse vars))))))
-    `(progn ,@body)))|#
 (defmacro cclet* (bindings &body body)
   "Local binding context for both interface pointers and plain Lisp values."
   (if bindings

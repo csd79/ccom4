@@ -3,7 +3,7 @@
 (defsystem "ccom3"
   :description "LispWorks 7.1 COM, but more lispy? v3"
   :author      "Denes Cselovszki <denes.cselovszki@gmail.com>"
-  :version     "0.24"
+  :version     "0.25"
   :depends-on  ("achar" )
   :serial      t
   :components  ((:file "package")
