@@ -2,11 +2,9 @@
                                                                              ;
 (in-package #:cl-user)
 
-(defpackage #:ccom3
+(defpackage #:ccom4
   (:use #:cl #:achar)
-  (:export #:?
-           #:!
-           #:property-accessors-on
-           #:with-property-accessors
-           #:cclet*
-           #:with-com-initialized))
+  (:export #:enable-ccom-syntax
+           #:disable-ccom-syntax
+           #:with-ccom-context
+           #:cclet*))

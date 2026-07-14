@@ -1,10 +1,10 @@
 (require "automation")
 
-(defsystem "ccom3"
-  :description "LispWorks 7.1 COM, but more lispy? v3"
+(defsystem "ccom4"
+  :description "Extra syntax for the LispWorks COM interface, v4"
   :author      "Denes Cselovszki <denes.cselovszki@gmail.com>"
-  :version     "0.25"
+  :version     "0.26"
   :depends-on  ("achar" )
   :serial      t
   :components  ((:file "package")
-                (:file "ccom3")))
+                (:file "ccom4")))
