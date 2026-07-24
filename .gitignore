@@ -15,5 +15,7 @@
 .sly/
 
 # Others
+archive/
 *.zip
 *.bat
+*.xlsx

@@ -4,7 +4,8 @@
 
 (defpackage #:ccom4
   (:use #:cl #:achar)
-  (:export #:enable-ccom-syntax
+  (:export #:live-iptr-p
+           #:enable-ccom-syntax
            #:disable-ccom-syntax
            #:with-ccom-context
            #:cclet*))
