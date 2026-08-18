@@ -3,7 +3,7 @@
 (defsystem "ccom4"
   :description "Extra syntax for the LispWorks COM interface, v4"
   :author      "Denes Cselovszki <denes.cselovszki@gmail.com>"
-  :version     "0.26"
+  :version     "0.27"
   :depends-on  ("achar" )
   :serial      t
   :components  ((:file "package")

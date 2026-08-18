@@ -6,8 +6,9 @@
 
 #|
 
-Comparison:
- 
+COMPARISON:
+
+
 VBA:
 Workbooks = Global.Workbooks
 Workbook  = Workbooks.Add(template := xlWorksheet)
@@ -16,8 +17,7 @@ Print(Worksheet.Range("A1"))
 Worksheet.Name = "New Name"
 
 
-
-Lisp:
+LispWorks:
 (com:with-temp-interface (workbook)
     (com:with-temp-interface (workbooks)
         (com:invoke-dispatch-get-property global "Workbooks")
@@ -31,8 +31,7 @@ Lisp:
     (setf (com:invoke-dispatch-get-property worksheet "Name") "New name")))
 
 
-
-Lisp & CCOM:
+CCOM4:
 #.(enable-ccom-syntax)
 (cclet* ((workbooks (?'workbooks global))
          (workbook  (!'add workbooks +xl-worksheet+))
@@ -66,13 +65,13 @@ Accessors can be passed as arguments:
       (!'quit excel))))
 #.(disable-ccom-syntax)
 
+
 The ! and ? macro characters only work as prefixes to the first element of a complex form:
 
 (enable-ccom-syntax)
 (print (read-from-string "!'method"))
 (disable-ccom-syntax))
-
--> !
+=> !
 
 |#
 
@@ -126,11 +125,9 @@ The ! and ? macro characters only work as prefixes to the first element of a com
                                   (intern-by-name (subseq op-name 1) *package*)
                                   (cons c args)))
                   (;; !'SYMBOL
-;                   (and (member a (list '! '?)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
                    (and (member op-name '("!" "?") :test #'string=)
                         (listp b)
                         (eq (first b) 'quote))
-;                   (dispatch-expr (char (symbol-name a) 0) c b args))
                    (dispatch-expr (char op-name 0) c b args))
                   (;; Otherwise, return the expression.
                    t expr))))
