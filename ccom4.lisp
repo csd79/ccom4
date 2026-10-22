@@ -123,7 +123,8 @@ The ! and ? macro characters only work as prefixes to the first element of a com
                         (member (char op-name 0) '(#\! #\?) :test #'char=))
                    (dispatch-expr (char op-name 0) b
                                   (intern-by-name (subseq op-name 1) *package*)
-                                  (cons c args)))
+;                                  (cons c args)))
+                                  (if c (cons c args) args)))
                   (;; !'SYMBOL
                    (and (member op-name '("!" "?") :test #'string=)
                         (listp b)
